@@ -69,7 +69,10 @@ void bisectionMethod(Interval const &interval, double const &eps) {
 
 template <class FuncClass>
 void newtonMethod(Interval const &interval, double const &eps) {
+	cout << "Newton method\n";
 	double x = (interval.end() + interval.start()) / 2;
+	cout << "First approximation: " << x << "\n";
+
 	double xOld = interval.start();
 	int n = 0;
 	
@@ -89,7 +92,6 @@ void newtonMethod(Interval const &interval, double const &eps) {
 		n++;
 	} while (abs(x - xOld) > eps);
 
-	cout << "Newton method\n";
 	cout << "Step: " << n << "\n";
 	cout << "Approximated solution: " << x << "\n";
 	cout << "Discrepansy module: " << abs(FuncClass::func(x)) << "\n\n";
@@ -99,7 +101,10 @@ template <class FuncClass>
 void secantMethod(Interval const &interval, double const &eps) {
 	double xOld_1 = interval.end();
 	double xOld_2 = interval.start();
+
+	cout << "Secant method\n";
 	double x = xOld_1;
+	cout << "First approximation: " << x << "\n";
 	
 	int n = 0;
 
@@ -120,14 +125,14 @@ void secantMethod(Interval const &interval, double const &eps) {
 		n++;
 	} while (abs(x - xOld_1) > eps);
 
-	cout << "Secant method\n";
 	cout << "Step: " << n << "\n";
 	cout << "Approximated solution: " << x << "\n";
 	cout << "Discrepansy module: " << abs(FuncClass::func(x)) << "\n\n";
 }
 
 int main() {
-	cout << "Methods of finding function roots.\nPodkopaev Anton, SPbSU, 2011\n\n";
+	cout << "Methods of finding function roots.\nPodkopaev Anton, SPbSU, 2011\n";
+	cout << "f(x) = x^2 - sin(5x)\n\n";
 
 	double A = -10;
 	double B = 10;
@@ -142,6 +147,8 @@ int main() {
 	cin >> eps;
 
 	double step = eps * 1000;
+	cout << "Enter first step: ";
+	cin >> step;
 
 	QLinkedList<Interval> intervals = rootDividing<CurFunc>(A, B, step);
 	int oldRootNumber = intervals.size();
@@ -149,6 +156,9 @@ int main() {
 		step /= 2;
 		intervals = rootDividing<CurFunc>(A, B, step);
 	} while((step > 2 * eps) && (oldRootNumber != intervals.size()));
+
+	cout << "Result tabulation step: " << step << "\n";
+	cout << "Interval number: " << intervals.size() << "\n\n";
 
 	cin.get();
 	foreach (Interval curInterval, intervals) {
