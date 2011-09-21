@@ -8,6 +8,8 @@
 
 using namespace std;
 
+const double minimumNotZero = 0.000000000000000000001;
+
 //class CurFunc : public Function {
 class CurFunc {
 	public:
@@ -73,7 +75,17 @@ void newtonMethod(Interval const &interval, double const &eps) {
 	
 	do {
 		xOld = x;
-		x -= FuncClass::func(x)/FuncClass::derivatedFunc(x);
+
+		double derivatedFuncValue = FuncClass::derivatedFunc(x);
+
+		if (abs(derivatedFuncValue) > minimumNotZero) {
+			x -= FuncClass::func(x) / derivatedFuncValue;
+		} else {
+			cout << derivatedFuncValue << "\n";
+			cout << "Hmmm... problem in Newton Method. Trying to divide by smth, too close to zero.\n";	
+			break;
+		}
+
 		n++;
 	} while (abs(x - xOld) > eps);
 
@@ -93,7 +105,16 @@ void secantMethod(Interval const &interval, double const &eps) {
 
 	do {
 		double temp = x;
-		x -= FuncClass::func(xOld_1) * (xOld_1 - xOld_2) / (FuncClass::func(xOld_1) - FuncClass::func(xOld_2));
+		double funcDiff = FuncClass::func(xOld_1) - FuncClass::func(xOld_2);
+
+		if (abs(funcDiff) > minimumNotZero) {
+			x -= FuncClass::func(xOld_1) * (xOld_1 - xOld_2) / funcDiff;
+		} else {
+			cout << funcDiff << "\n";
+			cout << "Hmmm... problem in secant Method. Trying to divide by smth, too close to zero.\n";	
+			break;
+		}
+
 		xOld_2 = xOld_1;
 		xOld_1 = temp;
 		n++;
