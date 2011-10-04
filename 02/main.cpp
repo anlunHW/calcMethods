@@ -31,6 +31,7 @@ int main() {
 	FuncInterpolation<CurFunc> interpolation;
 	interpolation.printValueTable();
 	interpolation.lagrangeMethod();
+	interpolation.newtonMethod();
 
 	return 0;
 }

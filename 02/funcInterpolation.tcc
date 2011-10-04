@@ -75,9 +75,12 @@ void FuncInterpolation<FuncClass>::lagrangeMethod() {
 
 	double result = lagrangePolynom(interPoint, polynomDegree);
 	cout << setprecision(20);
+	cout << "Interpolation point: " << interPoint << endl;
 	cout << "Function value: " << FuncClass::func(interPoint, 0) << endl;
 	cout << "Approximated solution: " << result << endl;
 	cout << "Disperancy module: " << fabs(result - FuncClass::func(interPoint, 0))<< endl;
+
+	cout << endl << endl;
 }
 
 template <class FuncClass>
@@ -100,4 +103,30 @@ template <class FuncClass>
 void FuncInterpolation<FuncClass>::newtonMethod() {
 	using namespace std;
 	cout << "Newton method" << endl;
+
+	double differenceTable[polynomDegree + 1][2 + polynomDegree];
+	for (int i = 0; i < polynomDegree + 1; i++) {
+		differenceTable[i][0] = interNodes->at(i);
+	}
+	for (int i = 0; i < polynomDegree + 1; i++) {
+		differenceTable[i][1] = interNodeValue->at(i);
+	}
+
+	for (int j = 2; j < 2 + polynomDegree; j++)
+		for (int i = 0; i < polynomDegree - (j - 2); i++) {
+			differenceTable[i][j] = (differenceTable[i + 1][j - 1] - differenceTable[i][j - 1])
+				/ (interNodes->at((j - 2) + i + 1) - interNodes->at(i));
+		}
+
+	double result = interNodeValue->at(0);
+	for (int i = 2; i < 2 + polynomDegree; i++)
+		result += differenceTable[0][i] * lagrangeOmega(interPoint, i - 1);
+
+	cout << setprecision(20);
+	cout << "Interpolation point: " << interPoint << endl;
+	cout << "Function value: " << FuncClass::func(interPoint, 0) << endl;
+	cout << "Approximated solution: " << result << endl;
+	cout << "Disperancy module: " << fabs(result - FuncClass::func(interPoint, 0))<< endl;
+
+	cout << endl << endl;
 }
