@@ -30,6 +30,7 @@ int main() {
 	
 	FuncInterpolation<CurFunc> interpolation;
 	interpolation.printValueTable();
+	interpolation.lagrangeMethod();
 
 	return 0;
 }
