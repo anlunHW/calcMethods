@@ -27,8 +27,14 @@ class CurFunc {
 int main() {
 	cout << "Methods of algebraic interpolation.\nPodkopaev Anton, SPbSU, 2011\n";
 	cout << "f(x) = sin(x) + x^2\n\n";
+
+	cout << "Use default problem parameters? [Y/n] ";
+	char useDefaultParameters = 'Y';
+	cin >> useDefaultParameters;
+
+	FuncInterpolation<CurFunc> interpolation(useDefaultParameters != 'Y');
 	
-	FuncInterpolation<CurFunc> interpolation;
+	cout << "Sorted Table" << endl;
 	interpolation.printValueTable();
 	interpolation.lagrangeMethod();
 	interpolation.newtonMethod();

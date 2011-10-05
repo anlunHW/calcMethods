@@ -30,6 +30,7 @@ class FuncInterpolation {
 	private:
 		void initParameters();
 		void printValueTable(int nodeToPrintNumber);
+		void printParameters();
 
 		double lagrangePolynom(double point, int degree);
 		double lagrangeOmega(double point, int degree);
@@ -39,6 +40,8 @@ class FuncInterpolation {
 		double interPoint; //interpolation point
 		int polynomDegree; //approximation polinom degree
 		int nodeNumber; //approximation node number
+
+		double interPointFuncValue;
 
 		std::vector<double> *interNodes;
 		std::vector<double> *interNodeValue;
