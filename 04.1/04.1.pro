@@ -9,13 +9,21 @@ INCLUDEPATH += .
 
 # Input
 SOURCES += main.cpp \
-    mainwindow.cpp
+    mainwindow.cpp \
+    inverseFunctionInterpolation.cpp \
+    interval.cpp
 
 HEADERS += \
-    mainwindow.h
+    mainwindow.h \
+    inverseFunctionInterpolation.h \
+    interval.h
 
 FORMS += \
     mainwindow.ui
+
+
+
+
 
 
 
