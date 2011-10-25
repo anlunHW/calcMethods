@@ -3,6 +3,8 @@
 #include <cmath>
 #include <iomanip>
 
+#include <QDebug>
+
 using namespace std;
 
 class CurFunc {
@@ -192,9 +194,26 @@ class FuncInterpolation {
 			}
 
 			for (int j = 2; j < 2 + polynomDegree; j++)
-				for (int i = 0; i < polynomDegree - (j - 2); i++) {
+				//for (int i = 0; i < polynomDegree - (j - 2); i++) {
+				for (int i = 0; i < nodeNumber - (j - 1); i++) {
 					differenceTable[i][j] = (differenceTable[i + 1][j - 1] - differenceTable[i][j - 1]);
 				}
+
+			printDifferenceTable();
+		}
+
+		void printDifferenceTable() {
+			if (!differenceTable)
+				return;
+
+			cout << "Difference Table:\n";
+			for (int i = 0; i < nodeNumber; i++) {
+				for (int j = 0; j < polynomDegree + 2; j++) {
+					cout.width(15);
+					cout << differenceTable[i][j];
+				}
+				cout << endl;
+			}
 		}
 
 		void interpolateTableBegin() {
@@ -212,7 +231,8 @@ class FuncInterpolation {
 		}
 
 		void interpolateTableEnd() {
-			double endPoint = startPoint + (nodeNumber - 1) * nodeStep; 
+			double endPoint = startPoint + (nodeNumber - 1) * nodeStep;
+			//qDebug() << endPoint;
 
 			double t = (interpolationPoint - endPoint) / nodeStep;
 			double result = differenceTable[nodeNumber - 1][1];
@@ -221,7 +241,7 @@ class FuncInterpolation {
 			for (int j = 2; j < 2 + polynomDegree; j++) {
 				fact *= (j - 1);
 				coef *= t + (j - 2);
-				result += differenceTable[nodeNumber - j + 1][j] * coef / fact;
+				result += differenceTable[nodeNumber - j][j] * coef / fact;
 			}
 
 			printResults(result, "endding");
@@ -229,8 +249,11 @@ class FuncInterpolation {
 
 		void interpolateTableMiddle() {
 			int middlePointNum = int ((interpolationPoint - startPoint) / nodeStep);
+			double middlePoint = startPoint + middlePointNum * nodeStep;
+			//qDebug() << "AAA" << middlePointNum;
 
-			double t = (interpolationPoint - middlePointNum) / nodeStep;
+			//double t = (interpolationPoint - middlePointNum) / nodeStep;
+			double t = (interpolationPoint - middlePoint) / nodeStep;
 			double result = differenceTable[middlePointNum][1];
 
 			double coef = 1;
@@ -238,10 +261,11 @@ class FuncInterpolation {
 			int sign = -1;
 			for (int j = 2; j < 2 + polynomDegree; j++) {
 				fact *= (j - 1);
-				coef *= (t - sign * int(j / 2));
+				coef *= (t - sign * ((j - 1) / 2));
 				sign *= -1;
 
-				result += differenceTable[middlePointNum - int(j / 2)][j] * coef / fact;
+				//result += differenceTable[middlePointNum - int(j / 2)][j] * coef / fact;
+				result += differenceTable[middlePointNum - ((j - 1) / 2)][j] * coef / fact;
 			}
 
 			printResults(result, "middle");
