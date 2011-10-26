@@ -14,11 +14,11 @@
 class FuncClass {
 	public:
 		static double func(double x) {
-			return x * x * x;
+			return sin(x);
 		}
 
 		static QString funcStr() {
-			return "f(x) = x ^ 3";
+			return "f(x) = sin(x)";
 		}
 };
 
@@ -76,11 +76,12 @@ class InverseFunctionInterpolation {
 
 	private:
 		InverseFunctionInterpolation(double mStartPoint, int mNodeNumber, double mNodeStep);
-		double lagrangeOmega(double point, int degree, double interFirstNode);
+		double lagrangeOmega(double point, int degree, double* nodeArr);
 		double interpolateFunction_equationFunc(double interPoint);
 		double interpolateFunction(double interPoint, int polynomDegree);
 		QLinkedList<Interval> rootDividing(double start, double end, double eps);
 		double secantMethod(Interval const &interval, double eps);
+		double bisectionMethod(Interval const &interval, double const &eps);
 
 		double mStartPoint;
 		int mNodeNumber;

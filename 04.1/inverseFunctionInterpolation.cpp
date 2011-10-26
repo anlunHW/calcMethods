@@ -78,22 +78,27 @@ double InverseFunctionInterpolation::interpolateInverseFunction_1(double interPo
 	}
 
 	for (int j = 2; j < 2 + polynomDegree; j++)
-		for (int i = 0; i < polynomDegree - (j - 2); i++) {
+		//for (int i = 0; i < polynomDegree - (j - 2); i++) {
+		for (int i = 0; i < polynomDegree - (j - 1); i++) {
 			differenceTable[i][j] = (differenceTable[i + 1][j - 1] - differenceTable[i][j - 1])
 				/ (mInverseValues[(j - 2) + i + 1].first - mInverseValues[i].first);
 		}
 
+	double nodes[polynomDegree + 1];
+	for (int i = 0; i < polynomDegree + 1; i++)
+		nodes[i] = differenceTable[i][0];
+
 	double result = mInverseValues[0].second;
 	for (int i = 2; i < 2 + polynomDegree; i++)
-		result += differenceTable[0][i] * lagrangeOmega(interPoint, i - 1, mInverseValues[0].first);
+		result += differenceTable[0][i] * lagrangeOmega(interPoint, i - 1, nodes);
 
 	return result;
 }
 
-double InverseFunctionInterpolation::lagrangeOmega(double point, int degree, double interFirstNode) {
+double InverseFunctionInterpolation::lagrangeOmega(double point, int degree, double* nodeArr) {
 	if (degree <= 1)
-		return point - interFirstNode;
-	return lagrangeOmega(point, degree - 1, interFirstNode) * (point - interFirstNode);
+		return point - nodeArr[0];
+	return lagrangeOmega(point, degree - 1, nodeArr) * (point - nodeArr[degree - 1]);
 }
 
 double InverseFunctionInterpolation::interpolateFunction_equationFunc(double interPoint) {
@@ -116,30 +121,57 @@ double InverseFunctionInterpolation::interpolateFunction(double interPoint, int 
 
 	for (int j = 2; j < 2 + polynomDegree; j++)
 		for (int i = 0; i < polynomDegree - (j - 2); i++) {
+		//for (int i = 0; i < polynomDegree - (j - 1); i++) {
 			differenceTable[i][j] = (differenceTable[i + 1][j - 1] - differenceTable[i][j - 1])
 				/ (curInterpolationNodes[(j - 2) + i + 1].first - curInterpolationNodes[i].first);
 		}
 
+	double nodes[polynomDegree + 1];
+	for (int i = 0; i < polynomDegree + 1; i++)
+		nodes[i] = differenceTable[i][0];
+
 	double result = curInterpolationNodes[0].second;
 	for (int i = 2; i < 2 + polynomDegree; i++)
-		result += differenceTable[0][i] * lagrangeOmega(interPoint, i - 1, curInterpolationNodes[0].first);
+		result += differenceTable[0][i] * lagrangeOmega(interPoint, i - 1, nodes);
 
 	return result;
 }
 
 double InverseFunctionInterpolation::interpolateInverseFunction_2() {
-	QLinkedList<Interval> intervals = rootDividing(mStartPoint, mStartPoint + mNodeNumber * mNodeStep, 2 * mSecondMethodAccuracy);
+	//QLinkedList<Interval> intervals = rootDividing(mStartPoint, mStartPoint + mNodeNumber * mNodeStep, 2 * mSecondMethodAccuracy);
+	QLinkedList<Interval> intervals = rootDividing(mStartPoint, mStartPoint + mNodeNumber * mNodeStep, 0.001);
 
 	QLinkedList<double> result;
 	foreach (Interval curInterval, intervals) {
-		result.append(secantMethod(curInterval, mSecondMethodAccuracy));
+		//result.append(secantMethod(curInterval, mSecondMethodAccuracy));
+		result.append(bisectionMethod(curInterval, mSecondMethodAccuracy));
 	}
 
 	return result.first();
 }
 
+double InverseFunctionInterpolation::bisectionMethod(Interval const &interval, double const &eps) {
+	double left = interval.start();
+	double right = interval.end();
+	double middle = (right + left) / 2;
+
+	int n = 0;
+
+	while (abs(left - right) > 2 * eps) {
+		if (interpolateFunction_equationFunc(left) * interpolateFunction_equationFunc(middle) > 0)
+			left = middle;
+		else
+			right = middle;
+		middle = (right + left) / 2;
+
+		n++;
+	}
+
+	return middle;
+}
+
 double InverseFunctionInterpolation::secantMethod(Interval const &interval, double eps) {
-	double minimumNotZero = 0.000000000000000000001;
+	//double minimumNotZero = 0.000000000000000000000000000001;
 
 	double xOld_1 = interval.end();
 	double xOld_2 = interval.start();
@@ -151,13 +183,15 @@ double InverseFunctionInterpolation::secantMethod(Interval const &interval, doub
 		double temp = x;
 		double funcDiff = interpolateFunction_equationFunc(xOld_1) - interpolateFunction_equationFunc(xOld_2);
 
-		if (abs(funcDiff) > minimumNotZero) {
+		//if (abs(funcDiff) > minimumNotZero) {
 			x -= interpolateFunction_equationFunc(xOld_1) * (xOld_1 - xOld_2) / funcDiff;
+		/*
 		} else {
 			qDebug() << funcDiff << "\n";
 			qDebug() << "Hmmm... problem in secant Method. Trying to divide by smth, too close to zero.\n";
 			break;
 		}
+		*/
 
 		xOld_2 = xOld_1;
 		xOld_1 = temp;
