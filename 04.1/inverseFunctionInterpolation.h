@@ -14,11 +14,15 @@
 class FuncClass {
 	public:
 		static double func(double x) {
-			return sin(x);
+			return 2 * sin(x) - x / 2;
+			//return sin(x);
+			//return x * x * x;
 		}
 
 		static QString funcStr() {
-			return "f(x) = sin(x)";
+			return "f(x) = 2 * sin(x) - x / 2";
+			//return "f(x) = x ^ 3";
+			//return "f(x) = sin(x)";
 		}
 };
 

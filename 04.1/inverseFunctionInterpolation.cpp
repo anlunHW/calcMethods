@@ -184,7 +184,9 @@ double InverseFunctionInterpolation::secantMethod(Interval const &interval, doub
 		double funcDiff = interpolateFunction_equationFunc(xOld_1) - interpolateFunction_equationFunc(xOld_2);
 
 		//if (abs(funcDiff) > minimumNotZero) {
-			x -= interpolateFunction_equationFunc(xOld_1) * (xOld_1 - xOld_2) / funcDiff;
+			//x -= interpolateFunction_equationFunc(xOld_1) * (xOld_1 - xOld_2) / funcDiff;
+			double coef = (xOld_1 - xOld_2) / funcDiff;
+			x -= interpolateFunction_equationFunc(xOld_1) * coef;
 		/*
 		} else {
 			qDebug() << funcDiff << "\n";
