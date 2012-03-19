@@ -18,6 +18,8 @@ class Matrix {
 
 		void operator +=(Matrix<T> const &);
 		void operator -=(Matrix<T> const &);
+		void operator *=(T const &);
+		void operator /=(T const &);
 		void operator =(Matrix<T> const &);
 		T* operator [](int) const;
 
@@ -25,6 +27,11 @@ class Matrix {
 		virtual Matrix<T> operator -(Matrix<T> const &);
 		virtual Matrix<T> operator *(Matrix<T> const &);
 		virtual Matrix<T> operator *(T const &);
+		virtual Matrix<T> operator /(T const &);
+
+		//scalar product
+		//ONLY for matrix with mColumnNumber == 1 
+		virtual T operator %(Matrix<T> const &);
 
 		Matrix<T> transposed() const;
 
@@ -39,7 +46,16 @@ class Matrix {
 		void addLineWithCoef(int firstLine, T coef, int resultLine);
 		void addColumnWithCoef(int firstColumn, T coef, int resultColumn);
 
+		T approximatedPrimeEigenvalue_scalarMethod(T delta);
+		T approximatedPrimeEigenvalue_scalarMethod(T delta, std::ostream& out);
+
+		T approximatedPrimeEigenvalue_degreeMethod(T delta);
+		T approximatedPrimeEigenvalue_degreeMethod(T delta, std::ostream& out);
+
 		T norm_inf();
+
+		T gershgorinLeftBorder();
+		T gershgorinRightBorder();
 		
 		T* array() const;
 

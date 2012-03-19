@@ -4,6 +4,8 @@
 #include <algorithm>
 #include "matrix.h"
 
+using namespace std;
+
 template <typename T>
 Matrix<T>::Matrix(int lineNumber, int columnNumber)
 	: mLineNumber(lineNumber)
@@ -104,6 +106,26 @@ Matrix<T> Matrix<T>::operator *(Matrix<T> const &m)
 }
 
 template <typename T>
+T Matrix<T>::operator %(Matrix<T> const &m)
+{
+	if (
+		mColumnNumber != 1 ||
+		m.mColumnNumber != 1 ||
+		mLineNumber != m.mLineNumber) 
+	{
+		//warning!
+		return 0;
+	}
+
+	T result = 0;
+	for (int i = 0; i < mLineNumber; i++) {
+		result += (*this)[i][0] * m[i][0];
+	}
+
+	return result;
+}
+
+template <typename T>
 Matrix<T> Matrix<T>::operator *(T const &k)
 {
 	Matrix<T> result(*this);
@@ -111,6 +133,32 @@ Matrix<T> Matrix<T>::operator *(T const &k)
 		for (int j = 0; j < mColumnNumber; j++)
 			result.mArray[i * result.mColumnNumber + j] *= k;
 	return result;
+}
+
+template <typename T>
+void Matrix<T>::operator *=(T const &k)
+{
+	for (int i = 0; i < mLineNumber; i++)
+		for (int j = 0; j < mColumnNumber; j++)
+			mArray[i * mColumnNumber + j] *= k;
+}
+
+template <typename T>
+Matrix<T> Matrix<T>::operator /(T const &k)
+{
+	Matrix<T> result(*this);
+	for ( int i = 0; i < mLineNumber; i++ )
+		for (int j = 0; j < mColumnNumber; j++)
+			result.mArray[i * result.mColumnNumber + j] /= k;
+	return result;
+}
+
+template <typename T>
+void Matrix<T>::operator /=(T const &k)
+{
+	for (int i = 0; i < mLineNumber; i++)
+		for (int j = 0; j < mColumnNumber; j++)
+			mArray[i * mColumnNumber + j] /= k;
 }
 
 template <typename T>
@@ -291,4 +339,210 @@ void Matrix<T>::exchangeColumns(int firstColumn, int secondColumn)
 		(*this)[i][firstColumn] = (*this)[i][secondColumn];
 		(*this)[i][secondColumn] = temp;
 	}
+}
+
+template <typename T>
+T Matrix<T>::gershgorinLeftBorder()
+{
+	T result = fabs((*this)[0][0]);
+
+	for (int i = 0; i < mLineNumber; i++) {
+		T curSmallM = (*this)[i][i];
+
+		for (int j = 0; j < mColumnNumber; j++) {
+			if (i == j)
+				continue;
+			curSmallM -= fabs((*this)[i][j]);
+		}
+
+		if (curSmallM < result)
+			result = curSmallM;
+	}
+
+	return result;
+}
+	
+template <typename T>
+T Matrix<T>::gershgorinRightBorder()
+{
+	T result = (*this)[0][0];
+
+	for (int i = 0; i < mLineNumber; i++) {
+		T curBigM = (*this)[i][i];
+
+		for (int j = 0; j < mColumnNumber; j++) {
+			if (i == j)
+				continue;
+			curBigM += fabs((*this)[i][j]);
+		}
+
+		if (curBigM > result)
+			result = curBigM;
+	}
+
+	return result;
+}
+
+template <typename T>
+T Matrix<T>::approximatedPrimeEigenvalue_scalarMethod(T delta)
+{
+	if (mLineNumber != mColumnNumber) {
+		return 0;
+	}
+
+	Matrix<T> eigenvectorApprox(mLineNumber, 1);
+	eigenvectorApprox[1][0] = 1; //just doing start approximation unequals to 0  
+	Matrix<T> eigenvectorApprox_previous = eigenvectorApprox;
+
+	Matrix<T> eigenvectorDiff = eigenvectorApprox - eigenvectorApprox_previous;
+	int stepNumber = 0;
+	T eigenvalueApprox = 0;
+	T eigenvalueApprox_previous = 3 * delta; // delta * 3 - just smth more than delta
+
+	while (fabs(eigenvalueApprox - eigenvalueApprox_previous) > delta) {
+		eigenvectorApprox_previous = eigenvectorApprox;
+		eigenvectorApprox = (*this) * eigenvectorApprox;
+
+		eigenvalueApprox_previous = eigenvalueApprox;
+		eigenvalueApprox = (eigenvectorApprox % eigenvectorApprox_previous)
+			/ (eigenvectorApprox_previous % eigenvectorApprox_previous);
+
+		eigenvectorApprox /= eigenvectorApprox.norm_inf();
+
+		eigenvectorDiff = eigenvectorApprox - eigenvectorApprox_previous;
+		stepNumber++;
+	}
+	
+	return eigenvalueApprox;
+}
+	
+template <typename T>
+T Matrix<T>::approximatedPrimeEigenvalue_scalarMethod(T delta, std::ostream& out)
+{
+	if (mLineNumber != mColumnNumber) {
+		out << "Error! Matrix isn't quadratic! Eigenvalues can't be found!";
+		return 0;
+	}
+
+	Matrix<T> eigenvectorApprox(mLineNumber, 1);
+	eigenvectorApprox[1][0] = 1; //just doing start approximation unequals to 0  
+	Matrix<T> eigenvectorApprox_previous = eigenvectorApprox;
+
+	Matrix<T> eigenvectorDiff = eigenvectorApprox - eigenvectorApprox_previous;
+	int stepNumber = 0;
+	T eigenvalueApprox = 0;
+	T eigenvalueApprox_previous = 3 * delta; // delta * 3 - just smth more than delta
+
+	while (fabs(eigenvalueApprox - eigenvalueApprox_previous) > delta) {
+		out << "\nStep " << stepNumber << "\n---------------\n";
+		out << "Eigenvector approximation:\n" << eigenvectorApprox << endl;
+		out << "Eigenvalue approximation: " << eigenvalueApprox << endl;
+		out << "Rn:\n";
+		out << (*this) * eigenvectorApprox - eigenvalueApprox * eigenvectorApprox;
+
+		eigenvectorApprox_previous = eigenvectorApprox;
+		eigenvectorApprox = (*this) * eigenvectorApprox;
+
+		eigenvalueApprox_previous = eigenvalueApprox;
+		eigenvalueApprox = (eigenvectorApprox % eigenvectorApprox_previous)
+			/ (eigenvectorApprox_previous % eigenvectorApprox_previous);
+
+		eigenvectorApprox /= eigenvectorApprox.norm_inf();
+
+		eigenvectorDiff = eigenvectorApprox - eigenvectorApprox_previous;
+		stepNumber++;
+	}
+
+	out << "\n\t\tResult\n\t\t---------------\n";
+	out << "Step number: " << stepNumber << endl;
+	out << "Eigenvalue approximation: " << eigenvalueApprox << endl;
+	out << "Eigenvector approximation:" << endl;
+	out << eigenvectorApprox;
+	out << "Rn:\n";
+	out << (*this) * eigenvectorApprox - eigenvalueApprox * eigenvectorApprox;
+
+	return eigenvalueApprox;
+}
+	
+template <typename T>
+T Matrix<T>::approximatedPrimeEigenvalue_degreeMethod(T delta)
+{
+	if (mLineNumber != mColumnNumber) {
+		return 0;
+	}
+
+	int const fixedLine = 1;
+
+	Matrix<T> eigenvectorApprox(mLineNumber, 1);
+	eigenvectorApprox[1][0] = 1; //just doing start approximation unequals to 0  
+	Matrix<T> eigenvectorApprox_previous = eigenvectorApprox;
+
+	Matrix<T> eigenvectorDiff = eigenvectorApprox - eigenvectorApprox_previous;
+	int stepNumber = 0;
+	T eigenvalueApprox = 0;
+	T eigenvalueApprox_previous = 3 * delta; // delta * 3 - just smth more than delta
+
+	while (fabs(eigenvalueApprox - eigenvalueApprox_previous) > delta) {
+		eigenvectorApprox_previous = eigenvectorApprox;
+		eigenvectorApprox = (*this) * eigenvectorApprox;
+
+		eigenvalueApprox_previous = eigenvalueApprox;
+		eigenvalueApprox = eigenvectorApprox[fixedLine][0] / eigenvectorApprox_previous[fixedLine][0];
+
+		eigenvectorApprox /= eigenvectorApprox.norm_inf();
+
+		eigenvectorDiff = eigenvectorApprox - eigenvectorApprox_previous;
+		stepNumber++;
+	}
+
+	return eigenvalueApprox;
+}
+	
+template <typename T>
+T Matrix<T>::approximatedPrimeEigenvalue_degreeMethod(T delta, std::ostream& out)
+{
+	if (mLineNumber != mColumnNumber) {
+		out << "Error! Matrix isn't quadratic! Eigenvalues can't be found!";
+		return 0;
+	}
+
+	int const fixedLine = 1;
+
+	Matrix<T> eigenvectorApprox(mLineNumber, 1);
+	eigenvectorApprox[1][0] = 1; //just doing start approximation unequals to 0  
+	Matrix<T> eigenvectorApprox_previous = eigenvectorApprox;
+
+	Matrix<T> eigenvectorDiff = eigenvectorApprox - eigenvectorApprox_previous;
+	int stepNumber = 0;
+	T eigenvalueApprox = 0;
+	T eigenvalueApprox_previous = 3 * delta; // delta * 3 - just smth more than delta
+
+	while (fabs(eigenvalueApprox - eigenvalueApprox_previous) > delta) {
+		out << "\nStep " << stepNumber << "\n---------------\n";
+		out << "Eigenvector approximation:\n" << eigenvectorApprox << endl;
+		out << "Eigenvalue approximation: " << eigenvalueApprox << endl;
+		out << "Rn:\n";
+		out << (*this) * eigenvectorApprox - eigenvalueApprox * eigenvectorApprox;
+
+		eigenvectorApprox_previous = eigenvectorApprox;
+		eigenvectorApprox = (*this) * eigenvectorApprox;
+
+		eigenvalueApprox_previous = eigenvalueApprox;
+		eigenvalueApprox = eigenvectorApprox[fixedLine][0] / eigenvectorApprox_previous[fixedLine][0];
+
+		eigenvectorApprox /= eigenvectorApprox.norm_inf();
+
+		eigenvectorDiff = eigenvectorApprox - eigenvectorApprox_previous;
+		stepNumber++;
+	}
+
+	out << "\n\t\tResult\n\t\t---------------\n";
+	out << "Step number: " << stepNumber << endl;
+	out << "Eigenvalue approximation: " << eigenvalueApprox << endl;
+	out << "Eigenvector approximation:" << endl;
+	out << eigenvectorApprox;
+	out << "Rn:\n";
+	out << (*this) * eigenvectorApprox - eigenvalueApprox * eigenvectorApprox;
+
+	return eigenvalueApprox;
 }

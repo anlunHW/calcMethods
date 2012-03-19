@@ -3,7 +3,8 @@
 
 using namespace std;
 
-typedef double CurrentType;
+//typedef double CurrentType;
+typedef float CurrentType;
 
 int main() {
 	cout << "Linear equation systems. Gauss method.\nPodkopaev Anton, 345 group\n";
