@@ -8,6 +8,9 @@ DEPENDPATH += .
 INCLUDEPATH += .
 
 # Input
+HEADERS += problemData.h
+
 SOURCES += main.cpp
 
 include (../matrixLib.pri)
+include (../integralLib.pri)
