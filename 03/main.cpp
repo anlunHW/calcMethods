@@ -15,8 +15,8 @@ CurrentType eArr[] = {
 
 Matrix<CurrentType> matrixE(3, 3, eArr);
 
-CurrentType const delta = 0.001;
-CurrentType const eps = 0.001;
+CurrentType const delta = 0.000000001;
+CurrentType const eps = 0.0000000001;
 
 CurrentType startApproximationArr[] = {
 	1,
@@ -54,6 +54,9 @@ int main() {
 	cout << "Solution that was found by Gauss method:\n";
 	cout << solution;
 	cout << endl;
+
+	cout << "\nDiscrepancy:\n";
+	cout << sys->systemCoef() * solution - sys->constTerm();
 
 	cout << "\t\tUsing Gershgorin theorem:\n";
 	CurrentType m = sys->systemCoef().gershgorinLeftBorder();
@@ -106,6 +109,7 @@ int main() {
 		cout << "\nStep " << k_iter << "\n---------------\n";
 		cout << "A priori estimation: " << pow(bAlpha.norm_inf(), k_iter) * x_1.norm_inf() / (1 - bAlpha.norm_inf()) << endl;
 		cout << "A posteriori estimation: " << bAlpha.norm_inf() * curDiff.norm_inf() / (1 - bAlpha.norm_inf()) << endl;
+		cout << "A actual estimation:\n" << curX - solution << endl;
 		cout << "Discrepancy:\n" << sys->systemCoef() * curX - sys->constTerm(); 
 
 		previousX = curX;
@@ -118,9 +122,9 @@ int main() {
 	cout << "A priori estimated number of steps: " << k << endl;
 	cout << "A priori estimation: " << pow(bAlpha.norm_inf(), k_iter) * x_1.norm_inf() / (1 - bAlpha.norm_inf()) << endl;
 	cout << "A posteriori estimation: " << bAlpha.norm_inf() * curDiff.norm_inf() / (1 - bAlpha.norm_inf()) << endl;
+	cout << "A actual estimation:\n" << curX - solution << endl;
 
 	cout << "\nApproximated solution:\n" << curX;
-
 
 	cout << "\n---------------\nSeidel method" << endl;
 	//x_0 = 0
@@ -130,7 +134,8 @@ int main() {
 	k_iter = 0;
 	do {
 		cout << "\nStep " << k_iter << "\n---------------\n";
-		cout << "Discrepancy:\n" << sys->systemCoef() * curX - sys->constTerm(); 
+		//cout << "Discrepancy:\n" << sys->systemCoef() * curX_seidel - sys->constTerm(); 
+		cout << "A actual estimation:\n" << curX_seidel - solution << endl;
 		for (int i = 0; i < sys->systemCoef().lineNumber(); i++) {
 			curX_seidel[i][0] = sys->constTerm()[i][0] / sys->systemCoef()[i][i];
 			for (int j = 0; j < i; j++) {
@@ -152,6 +157,7 @@ int main() {
 	cout << "\nApproximated solution:\n" << curX_seidel;
 
 	cout << "\n\t\tComparison\n\t\t---------------\n";
+	cout << "\nGauss solution:\n" << solution << endl;
 	cout << "\nIterative solution:\n" << curX;
 	cout << "\nSeidel solution:\n" << curX_seidel;
 	cout << "\nSeidel solution - iterative solution:\n" << curX_seidel - curX;
