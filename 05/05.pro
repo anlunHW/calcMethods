@@ -8,9 +8,15 @@ DEPENDPATH += .
 INCLUDEPATH += .
 
 # Input
-HEADERS += problemData.h
+HEADERS += \
+	problemData.h \
+	alphaFunc.h \
+	betaFunc.h
 
-SOURCES += main.cpp
+SOURCES += main.cpp \
+	alphaFunc.cpp \
+	betaFunc.cpp
+
 
 include (../matrixLib.pri)
 include (../integralLib.pri)

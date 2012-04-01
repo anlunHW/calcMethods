@@ -6,5 +6,7 @@
 using namespace std;
 
 int main() {
+	int const i = 5;
+
 	return 0;
 }

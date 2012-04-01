@@ -1,6 +1,7 @@
 HEADRES += \
-	../intergralLib/function.h \
-	../intergralLib/integralCalc.h \
-	../intergralLib/middleRectangleIntegralCalc.h \
-	../intergralLib/simpsonIntegralCalc.h \
-	../intergralLib/trapeziumIntegralCalc.h
+	../integralLib/function.h \
+	../integralLib/functionProduction.h \
+	../integralLib/fixedIntervalFunction.h
+
+SOURCES += \
+	../integralLib/function.cpp

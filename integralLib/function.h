@@ -1,22 +1,14 @@
 #pragma once
 
-#include <QString>
-#include <cmath>
-
 class Function {
 	public:
-		static double func(double x) {
-			return sin(x) + x * x;
-			//return sin(x);
-		}
+		virtual ~Function();
 
-		static double funcIntegral(double x) {
-			return -cos(x) + x * x * x / 3;
-			//return -cos(x);
-		}
+		virtual double func(double const x) const = 0;
+		virtual double calculateIntegral(unsigned const intervalNumber, double const leftBorder, double const rightBorder) const;
 
-		static QString funcString() {
-			return "f(x) = sin(x) + x ^ 2";
-			//return "f(x) = sin(x)";
-		}
+
+	protected:
+		//Simpson integral
+		virtual double calculatePrimaryIntervalIntegral(double const left, double const right) const;
 };
