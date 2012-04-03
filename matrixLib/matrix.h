@@ -14,6 +14,8 @@ class Matrix {
 		Matrix(int lineNumber, int columnNumber);
 		Matrix(int lineNumber, int columnNumber, T* arrayToCopy);
 		Matrix(Matrix<T> const &);
+		Matrix(int size); // returns E matrix
+
 		virtual ~Matrix();
 
 		void operator +=(Matrix<T> const &);

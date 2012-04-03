@@ -48,6 +48,21 @@ Matrix<T>::Matrix()
 }
 
 template <typename T>
+Matrix<T>::Matrix(int size)
+	: mLineNumber(size)
+	, mColumnNumber(size)
+{
+	mArray = new T[mLineNumber * mColumnNumber];
+	for (int i = 0; i < size; i++)
+		for (int j = 0; j < size; j++)
+			if (i == j) {
+				mArray[i * mColumnNumber + j] = 1;
+			} else {
+				mArray[i * mColumnNumber + j] = 0;
+			}
+}
+
+template <typename T>
 Matrix<T>::~Matrix<T>()
 {
 	if (mArray)

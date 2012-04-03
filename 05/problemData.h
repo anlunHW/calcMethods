@@ -1,3 +1,5 @@
+#include "../integralLib/function.h"
+
 #include "alphaFunc.h"
 #include "betaFunc.h"
 
@@ -10,9 +12,9 @@ class KernelFunc {
 };
 
 /// f(x) from problem
-class RightSideFunc {
+class RightSideFunc : public Function {
 	public:
-		static double func(double const x) {
+		double func(double const x) const {
 			return 1 - x * x;
 		}
 };
