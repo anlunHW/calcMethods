@@ -34,7 +34,7 @@ double const intervalLeftBorder = 0;
 double const intervalRightBorder = 1;
 
 // n - (node number - 1)
-int const nodeNumber = 100 + 1; 
+int const nodeNumber = 10 + 1; 
 
 // a (from heat equation)
 double const heatCoef = 1;
@@ -45,3 +45,6 @@ double const nodeStep =
 
 // T - max time
 double const maxTime = 1;
+
+// tau
+double const timeStep = nodeStep * nodeStep / (2 * heatCoef);

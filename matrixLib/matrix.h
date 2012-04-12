@@ -25,17 +25,20 @@ class Matrix {
 		void operator =(Matrix<T> const &);
 		T* operator [](int) const;
 
-		virtual Matrix<T> operator +(Matrix<T> const &);
-		virtual Matrix<T> operator -(Matrix<T> const &);
-		virtual Matrix<T> operator *(Matrix<T> const &);
-		virtual Matrix<T> operator *(T const &);
-		virtual Matrix<T> operator /(T const &);
+		virtual Matrix<T> operator +(Matrix<T> const &) const;
+		virtual Matrix<T> operator -(Matrix<T> const &) const;
+		virtual Matrix<T> operator *(Matrix<T> const &) const;
+		virtual Matrix<T> operator *(T const &) const;
+		virtual Matrix<T> operator /(T const &) const;
 
 		//scalar product
 		//ONLY for matrix with mColumnNumber == 1 
-		virtual T operator %(Matrix<T> const &);
+		virtual T operator %(Matrix<T> const &) const;
 
 		Matrix<T> transposed() const;
+		Matrix<T> line(int const lineIndex) const;
+		Matrix<T> column(int const columnIndex) const;
+
 
 		virtual std::ostream& print(std::ostream& out = std::cout) const;
 
@@ -68,7 +71,7 @@ class Matrix {
 		//for errors
 		Matrix();
 
-		static const int mPrintNumberWidth = 12;
+		static const int mPrintNumberWidth = 15;
 
 		int mLineNumber;
 		int mColumnNumber;

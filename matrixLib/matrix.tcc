@@ -94,7 +94,7 @@ int Matrix<T>::lineNumber() const
 }
 
 template <typename T>
-Matrix<T> Matrix<T>::operator *(Matrix<T> const &m)
+Matrix<T> Matrix<T>::operator *(Matrix<T> const &m) const
 {
 	if (mColumnNumber != m.mLineNumber) {
 		//warning!
@@ -121,7 +121,7 @@ Matrix<T> Matrix<T>::operator *(Matrix<T> const &m)
 }
 
 template <typename T>
-T Matrix<T>::operator %(Matrix<T> const &m)
+T Matrix<T>::operator %(Matrix<T> const &m) const
 {
 	if (
 		mColumnNumber != 1 ||
@@ -141,7 +141,7 @@ T Matrix<T>::operator %(Matrix<T> const &m)
 }
 
 template <typename T>
-Matrix<T> Matrix<T>::operator *(T const &k)
+Matrix<T> Matrix<T>::operator *(T const &k) const
 {
 	Matrix<T> result(*this);
 	for ( int i = 0; i < mLineNumber; i++ )
@@ -159,7 +159,7 @@ void Matrix<T>::operator *=(T const &k)
 }
 
 template <typename T>
-Matrix<T> Matrix<T>::operator /(T const &k)
+Matrix<T> Matrix<T>::operator /(T const &k) const
 {
 	Matrix<T> result(*this);
 	for ( int i = 0; i < mLineNumber; i++ )
@@ -217,7 +217,7 @@ void Matrix<T>::operator -=(Matrix<T> const &m)
 }
 
 template <typename T>
-Matrix<T> Matrix<T>::operator +(Matrix<T> const &m)
+Matrix<T> Matrix<T>::operator +(Matrix<T> const &m) const
 {
 	Matrix<T> result(*this);
 	result += m;
@@ -225,7 +225,7 @@ Matrix<T> Matrix<T>::operator +(Matrix<T> const &m)
 }
 
 template <typename T>
-Matrix<T> Matrix<T>::operator -(Matrix<T> const &m)
+Matrix<T> Matrix<T>::operator -(Matrix<T> const &m) const
 {
 	Matrix<T> result(*this);
 	result -= m;
@@ -560,4 +560,26 @@ T Matrix<T>::approximatedPrimeEigenvalue_degreeMethod(T delta, std::ostream& out
 	out << (*this) * eigenvectorApprox - eigenvalueApprox * eigenvectorApprox;
 
 	return eigenvalueApprox;
+}
+
+template <typename T>
+Matrix<T> Matrix<T>::line(int const lineIndex) const {
+	Matrix<T> result(1, columnNumber());
+
+	for (int i = 0; i < columnNumber(); i++) {
+		result[0][i] = (*this)[lineIndex][i];
+	}
+
+	return result;
+}
+
+template <typename T>
+Matrix<T> Matrix<T>::column(int const columnIndex) const {
+	Matrix<T> result(lineNumber(), 1);
+
+	for (int i = 0; i < lineNumber(); i++) {
+		result[i][0] = (*this)[i][columnIndex];
+	}
+
+	return result;
 }

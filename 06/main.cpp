@@ -25,7 +25,6 @@ Matrix<double> threeDiagonalMatrixResolvingMethod(
 		m[i + 1][0] = -c[i][0] / (a[i][0] * m[i][0] + b[i][0]);
 		k[i + 1][0] = (d[i][0] - a[i][0] * k[i][0]) / (a[i][0] * m[i][0] + b[i][0]);
 	}
-	cout << m;
 	
 	Matrix<double> result(systemSize, 1);
 	result[n][0] = (d[n][0] - a[n][0] * k[n][0]) / (a[n][0] * m[n][0] + b[n][0]);
@@ -37,10 +36,37 @@ Matrix<double> threeDiagonalMatrixResolvingMethod(
 	return result;
 }
 
-void heatEquationSolving() {
-	// tau
-	double const timeStep = nodeStep * nodeStep / (2 * heatCoef);
+void interactiveTimeLayerPrinting(
+		Matrix<double> const &approximatedSolution_evident
+		, Matrix<double> const &approximatedSolution_implicit
+		, Matrix<double> const &solution
+		)
+{
+	int columnIndex = 0;
+	while (columnIndex >= 0) {
+		cout << "Enter number of time layer to print (-1 to stop): ";
+		cin >> columnIndex;
+		if (columnIndex < 0)
+			break;
 
+		cout << "Approximated solution by evident method:\n";
+		cout << approximatedSolution_evident.column(columnIndex).transposed() << endl;
+		cout << "Approximated solution by implicit method:\n";
+		cout << approximatedSolution_implicit.column(columnIndex).transposed() << endl;
+		cout << "Solution:\n";
+		cout << solution.column(columnIndex).transposed() << endl << endl;
+
+		Matrix<double> discepancy_evident = approximatedSolution_evident.column(columnIndex) - solution.column(columnIndex);
+		cout << "Discepancy of evident method:\n" << discepancy_evident.transposed(); 
+
+		Matrix<double> discepancy_implicit = approximatedSolution_implicit.column(columnIndex) - solution.column(columnIndex);
+		cout << "Discepancy of implicit method:\n" << discepancy_implicit.transposed(); 
+		
+		cout << endl << endl;
+	}
+}
+
+void heatEquationSolving() {
 	double x[nodeNumber];
 	for (int i = 0; i < nodeNumber; i++) {
 		x[i] = intervalLeftBorder + nodeStep * i;
@@ -50,6 +76,14 @@ void heatEquationSolving() {
 	double t[timeNodeNumber];
 	for (int i = 0; i < timeNodeNumber; i++) {
 		t[i] = timeStep * i;
+	}
+
+	// CALCULATING SOLUTION
+	Matrix<double> solutionMatrix(nodeNumber, timeNodeNumber);
+	for (int i = 0; i < nodeNumber; i++) {
+		for (int j = 0; j < timeNodeNumber; j++) {
+			solutionMatrix[i][j] = solution(x[i], t[j]);
+		}
 	}
 
 	Matrix<double> approximatedSolution(nodeNumber, timeNodeNumber);
@@ -78,16 +112,62 @@ void heatEquationSolving() {
 		}
 	}
 
-	/*
-	approximatedSolution[i][k] =
-		(1 - 2 * equationCoef) * approximatedSolution[i][k - 1]
-		+ equationCoef * (approximatedSolution[i + 1][k - 1] + approximatedSolution[i - 1][k - 1])
-		+ timeStep * f(x[i], t[k - 1]);
-	*/
 	// IMPLICIT SCHEMA
+	Matrix<double> approximatedSolution_implicitMethod(nodeNumber, timeNodeNumber);
+	
+	// u(i, 0) = g(i)
+	for (int i = 0; i < nodeNumber; i++) {
+		approximatedSolution_implicitMethod[i][0] = g(x[i]);
+	}
+
+	for (int k = 1; k < timeNodeNumber; k++) {
+		Matrix<double> b(nodeNumber, 1);
+		Matrix<double> a(nodeNumber, 1);
+		Matrix<double> c(nodeNumber, 1);
+		Matrix<double> d(nodeNumber, 1);
+
+		b[0][0] = 1;
+		c[0][0] = 0;
+		d[0][0] = alpha(t[k]);
+
+		b[nodeNumber - 1][0] = 1;
+		a[nodeNumber - 1][0] = 0;
+		d[nodeNumber - 1][0] = beta(t[k]);
+
+		for (int i = 1; i < nodeNumber - 1; i++) {
+			b[i][0] = 1 + 2 * heatCoef * timeStep / (nodeStep * nodeStep);
+			d[i][0] = timeStep * f(x[i], t[k]) + approximatedSolution_implicitMethod[i][k - 1];
+
+			a[i][0] = -heatCoef * timeStep / (nodeStep * nodeStep);
+			c[i][0] = -heatCoef * timeStep / (nodeStep * nodeStep);
+		}
+
+		Matrix<double> curSolution_i = threeDiagonalMatrixResolvingMethod(a, b, c, d);
+		for (int i = 0; i < nodeNumber; i++) {
+			approximatedSolution_implicitMethod[i][k] = curSolution_i[i][0];
+		}
+	}
+
+	// result printing
+		
+	interactiveTimeLayerPrinting(approximatedSolution, approximatedSolution_implicitMethod, solutionMatrix);
 }
 
 int main() {
+	cout << "Problem №6, 8. Solving II level differential equation\nPodkopaev Anton, 345 group\n\n";
+	cout << "Solving interval:\n";
+	cout << "a = " << intervalLeftBorder << "\n";
+	cout << "b = " << intervalRightBorder << "\n\n";
+	cout << "f(x, t) = exp(-t) * (x^2 - x + 2)\n";
+	cout << "u(x, 0) = cos(0.5 * x) + (1 - x) * x\n";
+	cout << "u(0, t) = exp(-0.25 * t)\n";
+	cout << "u(1, t) = exp(-0.25 * t) * cos(0.5)\n";
+	cout << "Number of node on coordinate dimension: " << nodeNumber << "\n";
+	cout << "Coordinate node step: " << nodeStep << "\n";
+	cout << "Max time: " << maxTime << "\n";
+	cout << "Time node step: " << timeStep << "\n";
+	cout << "Number of time nodes: " << (int) maxTime / timeStep << "\n";
+
 	/*
 	double a_arr[] = {0, 1, 1, 1};
 	double b_arr[] = {1, 1, 1, 1};
@@ -103,6 +183,8 @@ int main() {
 	
 	cout << solution(0, 0) << endl;
 	*/
+
+	heatEquationSolving();
 
 	return 0;
 }
