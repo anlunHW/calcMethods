@@ -1,0 +1,42 @@
+\documentclass[12pt]{article}
+\usepackage{fontspec}
+\usepackage{polyglossia}
+\usepackage{listings}
+\setdefaultlanguage{russian}
+\setmainfont[Mapping=tex-text]{CMU Serif}
+
+\begin{document}
+\subsubsection*{Отчет по курсу "Параллельные алгоритмы и программрование"
+аспиранта 2 курса кафедры СП Подкопаева А.В.}
+\textbf{Задача:}\\
+Вычисление двух норм матрицы, используя распараллеливание с помощью OpenMP.\\
+\textbf{Формулы для норм:}\\
+$$
+S_{1} = max_{i}\Sigma_{j}|a_{ij}|
+$$
+$$
+S_{2} = max_{j}\Sigma_{i}|a_{ij}|
+$$
+\textbf{Тестовые данные:}\\
+Матрицы с размерами от 2x2 до 2000x2000.\\
+\textbf{Результат:}\\
+Существенного роста производительности не замечено.
+
+\textbf{Файл сборки (makefile):}
+{\small
+\lstinputlisting[language=make]{makefileTex}
+}
+
+\textbf{Основная программа (main.cpp):}
+
+{\small
+\lstinputlisting[language=c++]{main.cpp}
+}
+
+\textbf{Программа генерации тестовых данных (matrixCreate.cpp):}
+{\small
+\lstinputlisting[language=c++]{matrixCreate.cpp}
+}
+
+
+\end{document}
